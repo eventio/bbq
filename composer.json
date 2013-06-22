@@ -1,0 +1,26 @@
+{
+    "name": "eventio/bbq",
+    "type": "library",
+    "description": "PHP Message Queue Abstraction Library",
+    "keywords": ["mq", "message queue", "beanstalkd", "ironmq"],
+    "homepage": "https://github.com/eventio/bbq",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ville Mattila",
+            "email": "ville@eventio.fi",
+            "homepage": "http://github.com/vmattila",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "require-dev": {
+        "pda/pheanstalk": "2.1.0",
+        "iron-io/iron_mq": "1.4.5"
+    },
+    "autoload": {
+        "psr-0": {"Eventio\\BBQ": "src/"}
+    }
+}
