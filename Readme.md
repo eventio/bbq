@@ -10,7 +10,13 @@ in different environments.
 Installation
 ------------
 
-(WIP)
+Via [composer.json](http://getcomposer.org/doc/01-basic-usage.md#composer-json-project-setup)
+
+    "require": {
+        "eventio/bbq": "dev-master"
+    }
+
+For Symfony2 projects, you can use [EventioBBQBundle](https://github.com/eventio/bbq-bundle)
 
 Basic Usage
 -----------
