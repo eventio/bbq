@@ -48,7 +48,7 @@ abstract class AbstractQueue implements QueueInterface
      */
     protected function lockJob(JobInterface $job)
     {
-        $this->lockedJobs[] = $job;
+        $this->lockedJobs[spl_object_hash($job)] = $job;
     }
 
     /**
@@ -57,9 +57,7 @@ abstract class AbstractQueue implements QueueInterface
      */
     protected function deleteLockedJob(JobInterface $job)
     {
-        $this->lockedJobs = array_filter($this->lockedJobs, function($item) use ($job) {
-                    return ($job !== $item);
-                });
+        unset($this->lockedJobs[spl_object_hash($job)]);
     }
 
     abstract protected function init();
@@ -79,4 +77,10 @@ abstract class AbstractQueue implements QueueInterface
         return (count($this->lockedJobs) > 0);
     }
 
+    public function releaseLockedJobs()
+    {
+        foreach ($this->lockedJobs as $lockedJob) {
+            $this->releaseJob($lockedJob);
+        }
+    }
 }

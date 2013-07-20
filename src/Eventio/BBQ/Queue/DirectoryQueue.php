@@ -98,11 +98,11 @@ class DirectoryQueue extends AbstractQueue
         }
     }
 
+    /**
+     * @deprecated, use releaseLockedJobs() instead
+     */
     public function releaseUnfinishedJobs()
     {
-        foreach ($this->lockedJobs as $lockedJob) {
-            $this->releaseJob($lockedJob);
-        }
+        $this->releaseLockedJobs();
     }
-
 }

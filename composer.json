@@ -18,7 +18,8 @@
     },
     "require-dev": {
         "pda/pheanstalk": "2.1.0",
-        "iron-io/iron_mq": "1.4.5"
+        "iron-io/iron_mq": "1.4.5",
+        "predis/predis": ">=0.8"
     },
     "autoload": {
         "psr-0": {"Eventio\\BBQ": "src/"}

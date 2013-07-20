@@ -92,6 +92,57 @@ the name of the tube to the constructor.
 
 Non-deleted but fetched jobs are returned to the queue when the script ends.
 
+### RedisQueue ([Redis](http://redis.io/) server)
+
+    $redis = new \Predis\Client();
+    $queueListKey = 'queue_key';
+    $queue = new RedisQueue('queue_id', $redis, $queueListKey);
+
+RedisQueue uses the [Predis PHP Library](https://github.com/nrk/predis) to access
+the configured Redis servers. The actual queue is implemented by a Redis list.
+
+* `pushJob()` adds the job payload to the list using `[LPUSH](http://redis.io/commands/lpush)`
+* `fetchJob()` fetches the job using `[BRPOPLPUSH](http://redis.io/commands/brpoplpush)` or `[RPOPLPUSH](http://redis.io/commands/rpoplpush)`
+* `finalizeJob()` deletes the job using `[LREM](http://redis.io/commands/lrem)` from the processing queue
+* `releaseJob()` moves the job back to the list queue using `[RPOPLPUSH](http://redis.io/commands/lrem)`
+
+Non-deleted but fetched jobs are returned to the queue when the script ends.
+
+RedisQueue uses a concept of processing queue to ensure the queue reliability also in case of the client
+failures. Processing queue lives in a special key only between `fetchJob()` and `finalizeJob()` (or `releaseJob()`) calls.
+The processing queue key name is automatically constructed in `fetchJob()` call and follows by default the pattern
+`<queue_name>:<host_name>:<pid>(random unique string)`. [Read more about reliable queue pattern.](http://redis.io/commands/rpoplpush)
+
+**Queue Configuration**
+
+You can further customize the queue configuration by passing fourth argument to the queue constructor.
+
+    $queue = new RedisQueue('queue_id', $redis, $queueListKey, $configuration);
+
+`$configuration` should be an associative array. The default configuration (and possible variables) are following.
+
+    $configuration = array(
+        'processing_queue_key_prefix' => '%q:%h:%p',
+        'allow_infinite_blocking' => false,
+        'skip_shutdown_release' => false,
+    );
+
+`processing_queue_key_prefix`:  The prefix pattern for the processing queue key.
+There are a few placeholders that are replaced with actual values:
+`%q` main queue name, `%h` hostname and `%p` PHP process ID.
+
+`allow_infinite_blocking`: By default, if you do not pass any timeout
+(or `NULL` or `0` or `false`) for `fetchJob()`, RedisQueue will do
+non-blocking `[RPOPLPUSH](http://redis.io/commands/rpoplpush)`
+call instead of blocking `[BRPOPLPUSH](http://redis.io/commands/brpoplpush)`. If the queue
+contains no jobs, the function is returned immediately. If you set `allow_infinite_blocking` to `true` and
+pass no timeout to `fetchJob()`, the queue forces to use `[BRPOPLPUSH](http://redis.io/commands/brpoplpush)` even
+with no timeout (=infinite blocking). Use with care.
+
+`ship_shutdown_release`: By default, the queue registers a call that releases
+possibly unreleased and unfinished but fetched jobs back to the queue. Set to `true` to
+disable the functionality.
+
 ### IronMQQueue
 
     $ironMQ = new \IronMQ(array(
