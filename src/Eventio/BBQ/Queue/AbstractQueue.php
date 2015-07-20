@@ -83,4 +83,9 @@ abstract class AbstractQueue implements QueueInterface
             $this->releaseJob($lockedJob);
         }
     }
+    
+    public function keepAlive(JobInterface $job)
+    {
+        return;
+    }
 }

@@ -99,5 +99,11 @@ class RedisQueue extends AbstractQueue
         $this->predis->rpoplpush($job->getProcessingKey(), $this->queueKey);
         $this->deleteLockedJob($job);
     }
-    
+
+    public function keepAlive(JobInterface $job)
+    {
+        // This command keeps Predis connection alive during long-running processing,
+        // called in HandleQueueCommand.php
+        $this->predis->ping();
+    }
 }
